@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}
+                          
+{% if not is_edit %}             
+<title>Добавить запись</title>
+{% else %} 
+<title>Редактировать запись</title>
+{% endif %}                  
+{% endblock %} 
+{% block content %}
+{% load user_filters%}           <!--- Загружаем фильтры из приложения core -->
+<div class="row justify-content-center">
+    <div class="col-md-8 p-5">
+        <div class="card">
+            <div class="card-header">              
+              {% if not is_edit %}                                
+                Добавить запись         
+              {% else %}              
+                Редактировать запись
+             {% endif %}
+            </div>
+            <div class="card-body">                                
+                    {% if form.errors %} 
+                        {% for field in form %} 
+                          {% for error in form.errors %}
+                              <div class="alert alert-danger" role="alert">
+                                {{ error|escape }}
+                              </div>
+                          {% endfor %}
+                       {% endfor %}
+                       {% for error in form.non_field_errors %}
+                       <div class="alert alert-danger">
+                         {{ error|escape }}
+                       </div>
+                       {% endfor %}
+                    {% endif %}
+                {% include 'includes/post_form.html' %}    
+            </div> 
+        </div> 
+    </div> 
+</div> 
+{% endblock %}  

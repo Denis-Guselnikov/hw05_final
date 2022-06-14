@@ -1,0 +1,26 @@
+{% load user_filters%}  
+<form method="post" enctype="multipart/form-data" action={% if not is_edit %}"{% url 'posts:post_create' %}"{% else %}"{% url 'posts:post_edit' post_id=post.id %}"{% endif %}>  
+    {% csrf_token %}
+      {% for field in form %}  <!--- field - поля модели, которые должны отображаться в веб-форме (group, text)-->
+          <div class="form-group row" aria-required={% if field.field.required %}"true"{% else %}"false"{% endif %}>
+                  <label for="{{ field.id_for_label }}" class="col-md-4 col-form-label text-md-right">  <!-- Тег label - заголовок для поля ввода -->
+                    {{ field.label }}  <!--- Название полей для ввода (group, text)-->
+                  </label>
+                  <div class="col-md-6">
+                      {{ field|addclass:"form-control" }} <!--- Фильтр addclass с параметром form-control из приложения core -->
+                      {% if field.help_text|safe %}       <!--- Сохранение текста в форме для публикации записи -->
+                      <small id="{{ field.id_for_label }}-help" class="form-text text-muted">{{ field.help_text|safe }}</small>
+                      {% endif %}
+                  </div>
+          </div>
+      {% endfor %}
+      <div class="col-md-6 offset-md-4"> 
+              <button type="submit" class="btn btn-primary">   <!-- Кнопка с надписью "Сохранить/Добавить" -->
+                  {% if is_edit%}        <!-- Изменяется надпись на кнопке в зависимости от операции - "Сохранить/Добавить" -->
+                    Сохранить
+                  {% else %} 
+                    Добавить
+                  {% endif %}
+              </button>
+      </div>
+</form>
