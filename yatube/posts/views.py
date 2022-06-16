@@ -27,14 +27,10 @@ def group_posts(request, slug):
 
 def profile(request, username):
     author = get_object_or_404(User, username=username)
-    if request.user.is_authenticated:
-        following = Follow.objects.filter(user=request.user,
-                                          author=author).exists()
-    else:
-        following = False
+    following = request.user.is_authenticated and Follow.objects.filter(
+        user=request.user, author=author).exists()
     context = {
         'following': following,
-        'title': f'Профайл пользователя {username}',
         'author': author,
     }
     context.update(get_page_context(author.posts.all(), request))
@@ -44,11 +40,9 @@ def profile(request, username):
 def post_detail(request, post_id):
     post_id = get_object_or_404(Post, id=post_id)
     form = CommentForm(request.POST or None)
-    comments = post_id.comments.all()
     context = {
         'post_id': post_id,
         'form': form,
-        'comments': comments,
     }
     return render(request, 'posts/post_detail.html', context)
 

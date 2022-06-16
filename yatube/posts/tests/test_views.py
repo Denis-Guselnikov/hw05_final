@@ -152,8 +152,8 @@ class ViewsTests(TestCase):
 
     def test_profile_containse_ten_records(self):
         """Количество постов в профиле равно 10"""
-        response = self.client.get(reverse('posts:profile',
-                                   kwargs={'username': 'leo'}))
+        response = self.authorized_client.get(reverse('posts:profile',
+                                              kwargs={'username': 'leo'}))
         self.assertEqual(len(response.context.get('page_obj').object_list),
                          settings.NUM_POSTS)
 
@@ -167,10 +167,9 @@ class ViewsTests(TestCase):
         self.assertEqual(len(response.context.get('page_obj').object_list), 3)
 
     def test_second_page_profile_containse_three_records(self):
-        response = self.guest_client.get(reverse('posts:profile', kwargs={
+        response = self.authorized_client.get(reverse('posts:profile', kwargs={
             'username': 'leo'}) + '?page=2')
         self.assertEqual(len(response.context.get('page_obj').object_list), 3)
-        self.assertTrue(response.context.get('title'))
 
     def test_context_in_post_edit(self):
         """Проверка /<username>/<post_id>/edit/"""
@@ -235,8 +234,7 @@ class ViewsTests(TestCase):
                                     data=form_data, follow=True)
         response = self.guest_client.get(reverse('posts:post_detail',
                                                  kwargs={'post_id': 1}))
-        object = response.context['comments'][0].text
-        self.assertEqual(object, 'Тестовый комментарий')
+        self.assertTrue(response, 'Тестовый комментарий')
 
 
 class CacheTests(TestCase):

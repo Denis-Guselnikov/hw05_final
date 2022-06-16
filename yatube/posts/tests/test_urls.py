@@ -17,7 +17,6 @@ class URLTests(TestCase):
         cls.author_post = User.objects.create_user(username='leo')
         cls.no_author_post = User.objects.create_user(username='no_leo')
 
-        # Создание тестового поста
         cls.post = Post.objects.create(
             author=cls.author_post,
             group=cls.group,
@@ -41,16 +40,23 @@ class URLTests(TestCase):
             '/posts/1/': 'posts/post_detail.html',
             '/group/slug/': 'posts/group_list.html',
             '/profile/leo/': 'posts/profile.html',
+            '/follow/': 'posts/follow.html',
         }
         for address, template in templates_url_names.items():
             with self.subTest(address=address):
                 response = self.authorized_client.get(address)
                 self.assertTemplateUsed(response, template)
 
-    def test_create_url(self):
-        """Страница /create/ доступна авторизованному пользователю."""
-        response = self.authorized_client.get('/create/')
-        self.assertEqual(response.status_code, HTTPStatus.OK)
+    def test_authorized_client_status_code(self):
+        """Страницы доступные для авторизованного пользователя"""
+        pages_urls_status = {
+            '/create/': HTTPStatus.OK,
+            '/follow/': HTTPStatus.OK,
+        }
+        for urls, status_code in pages_urls_status.items():
+            with self.subTest(urls=urls):
+                response = self.authorized_client.get(urls)
+                self.assertTrue(response, status_code)
 
     def test_unknown_page(self):
         """Страница не существует."""
@@ -62,6 +68,7 @@ class URLTests(TestCase):
         pages_urls_status = {
             '/create/': HTTPStatus.NOT_FOUND,
             '/password_reset/': HTTPStatus.NOT_FOUND,
+            '/follow/': HTTPStatus.NOT_FOUND,
         }
         for urls, status_code in pages_urls_status.items():
             with self.subTest(urls=urls):
