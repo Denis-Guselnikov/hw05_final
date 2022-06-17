@@ -51,10 +51,15 @@ class ViewsTests(TestCase):
                 author=cls.author_post,
                 group=cls.group,
                 text='Текст',
-                image=uploaded
+                image=uploaded,
             )
             posts_list.append(post)
         cls.post = Post.objects.bulk_create(objs=posts_list)
+
+        cls.follow = Follow.objects.create(
+            user=cls.author_post,
+            author=cls.author_post,
+        )
 
     @classmethod
     def tearDownClass(cls):
@@ -111,6 +116,11 @@ class ViewsTests(TestCase):
         self.assertEqual(post_author, 'leo')
         self.assertTrue(post_image, 'posts/small.gif')
 
+    def test_following_show_context(self):
+        following = reverse('posts:profile', kwargs={'username': 'leo'})
+        response = self.guest_client.get(following)
+        self.assertTrue(self.follow.author, response.context.get('following'))
+
     def test_group_list_correct_context(self):
         """Шаблон group_list.html сформирован с правильным контекстом."""
         response = self.authorized_client.get(reverse('posts:group_list',
@@ -127,7 +137,7 @@ class ViewsTests(TestCase):
         """Шаблон post_detail.html сформирован с правильным контекстом."""
         response = self.authorized_client.get(reverse('posts:post_detail',
                                               kwargs={'post_id': 1}))
-        first_object = response.context['post_id']
+        first_object = response.context['post']
         post_author = first_object.author
         post_text = first_object.text
         group_title = first_object.group.title
