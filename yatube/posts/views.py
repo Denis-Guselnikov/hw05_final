@@ -30,7 +30,7 @@ def profile(request, username):
     following = (request.user.is_authenticated) and (
         Follow.objects.filter(user=request.user, author=author).exists())
     context = {
-        'followind': following,
+        'following': following,
         'author': author,
     }
     context.update(get_page_context(author.posts.all(), request))
